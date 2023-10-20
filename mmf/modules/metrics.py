@@ -780,17 +780,22 @@ class F1(BaseMetric):
         scores = model_output["scores"]
         expected = sample_list["targets"]
 
+        newfile = open('/content/results_{}_{}.txt'.format(dataset_name,dataset_type),'w')
         if self._multilabel:
             output = torch.sigmoid(scores)
+            dictt['output_before_threshold'] = output.cpu().tolist()
             output = torch.round(output)
             expected = _convert_to_one_hot(expected, output)
+            
         else:
             # Multiclass, or binary case
             output = scores.argmax(dim=-1)
             if expected.dim() != 1:
                 # Probably one-hot, convert back to class indices array
                 expected = expected.argmax(dim=-1)
-
+        dictt['expected_processed'] = expected.cpu().tolist()
+        dictt['output_processed'] = output.cpu().tolist()
+        newfile.write(json.dumps(dictt))
         value = f1_score(expected.cpu(), output.cpu(), **self._sk_kwargs)
 
         return expected.new_tensor(value, dtype=torch.float)

@@ -7,11 +7,11 @@ dataset_config:
     use_features: false
     images:
       train:
-      - data_splits/dev_images
+      - imgs/dev_images
       test:
-      - data_splits/test_images
+      - imgs/test_images
       val:
-      - data_splits/validation_images
+      - imgs/validation_images
     features:
       train:
       - propaganda/defaults/features/detectron.lmdb
@@ -21,11 +21,11 @@ dataset_config:
       - propaganda/defaults/features/detectron.lmdb
     annotations:
       train:
-      - data_splits/data/mmf/train.jsonl
+      - mmf_data/mmf/train.jsonl
       test:
-      - data_splits/data/mmf/test.jsonl
+      - mmf_data/mmf/test.jsonl
       val:
-      - data_splits/data/mmf/validation.jsonl
+      - mmf_data/mmf/validation.jsonl
     max_features: 100
     processors:
       text_processor:
