@@ -12,17 +12,9 @@ from mmf.utils.visualize import visualize_images
 from PIL import Image
 from torchvision import transforms
 
-def get_labels_vocab(data):
-    all_labels = set([])
-    for x in data:
-        for l in x['labels']:
-            if l not in all_labels:
-                all_labels.add(l)
-    label_vocab = {k: v for k, v in zip(all_labels, range(len(all_labels)))}
-    return label_vocab
 
-class PropagandaTask3FeaturesDataset(MMFDataset):
-    def __init__(self, config, *args, dataset_name="propaganda", **kwargs):
+class HatefulMemesFeaturesDataset(MMFDataset):
+    def __init__(self, config, *args, dataset_name="hateful_memes", **kwargs):
         super().__init__(dataset_name, config, *args, **kwargs)
         assert (
             self._use_features
@@ -50,11 +42,28 @@ class PropagandaTask3FeaturesDataset(MMFDataset):
 
         current_sample.id = torch.tensor(int(sample_info["id"]), dtype=torch.int)
 
-        label = torch.zeros(22)
-        label[[self.labels[tgt] for tgt in sample_info["labels"]]] = 1
-        current_sample.targets = label
-        current_sample.image = self.image_db[idx]["images"][0]
-        
+        # Instead of using idx directly here, use sample_info to fetch
+        # the features as feature_path has been dynamically added
+        features = self.features_db.get(sample_info)
+        if hasattr(self, "transformer_bbox_processor"):
+            features["image_info_0"] = self.transformer_bbox_processor(
+                features["image_info_0"]
+            )
+        current_sample.update(features)
+
+        fg_dataset_type = self.config.get("fg_dataset_type", None)
+        if fg_dataset_type:
+            current_sample = self.process_fg_labels(
+                fg_dataset_type=fg_dataset_type,
+                sample_info=sample_info,
+                current_sample=current_sample,
+            )
+        else:
+            if "label" in sample_info:
+                current_sample.targets = torch.tensor(
+                    sample_info["label"], dtype=torch.long
+                )
+
         return current_sample
 
     def process_fg_labels(self, fg_dataset_type, sample_info, current_sample):
@@ -88,8 +97,8 @@ class PropagandaTask3FeaturesDataset(MMFDataset):
             return generate_binary_prediction(report)
 
 
-class PropagandaTask3Dataset(MMFDataset):
-    def __init__(self, config, *args, dataset_name="propaganda", **kwargs):
+class HatefulMemesImageDataset(MMFDataset):
+    def __init__(self, config, *args, dataset_name="hateful_memes", **kwargs):
         super().__init__(dataset_name, config, *args, **kwargs)
         assert (
             self._use_images
@@ -115,11 +124,11 @@ class PropagandaTask3Dataset(MMFDataset):
         # Get the first image from the set of images returned from the image_db
         current_sample.image = self.image_db[idx]["images"][0]
 
-        
-        label = torch.zeros(22)
-        label[[self.labels[tgt] for tgt in sample_info["labels"]]] = 1
-        current_sample.targets = label
-        
+        if "label" in sample_info:
+            current_sample.targets = torch.tensor(
+                sample_info["label"], dtype=torch.long
+            )
+
         return current_sample
 
     def format_for_prediction(self, report):

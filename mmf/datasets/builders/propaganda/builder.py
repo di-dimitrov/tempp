@@ -41,9 +41,9 @@ class PropagandaBuilder(MMFDatasetBuilder):
         return self.dataset
 
     def build(self, config, *args, **kwargs):
-        self.data_folder = os.path.join(
-            get_mmf_root(), config.data_dir
-        )
+        # self.data_folder = os.path.join(
+            # get_mmf_root(), config.data_dir
+        # )
         super().build(config, *args, **kwargs)
 
     def update_registry_for_model(self, config):

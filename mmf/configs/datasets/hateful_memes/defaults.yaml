@@ -1,5 +1,5 @@
 dataset_config:
-  propaganda:
+  hateful_memes:
     data_dir: ${env.data_dir}/datasets
     depth_first: false
     fast_read: false
@@ -7,22 +7,25 @@ dataset_config:
     use_features: false
     images:
       train:
-      - propaganda/defaults/images/
+      - hateful_memes/defaults/images/
       val:
-      - propaganda/defaults/images/
+      - hateful_memes/defaults/images/
       test:
-      - propaganda/defaults/images/
+      - hateful_memes/defaults/images/
     features:
       train:
-      - propaganda/defaults/features/detectron.lmdb
+      - hateful_memes/defaults/features/detectron.lmdb
       val:
-      - propaganda/defaults/features/detectron.lmdb
+      - hateful_memes/defaults/features/detectron.lmdb
       test:
-hat      - propaganda/defaults/annotations/train.jsonl
+      - hateful_memes/defaults/features/detectron.lmdb
+    annotations:
+      train:
+      - hateful_memes/defaults/annotations/train.jsonl
       val:
-      - propaganda/defaults/annotations/dev.jsonl
+      - hateful_memes/defaults/annotations/dev_unseen.jsonl
       test:
-      - propaganda/defaults/annotations/test.jsonl
+      - hateful_memes/defaults/annotations/test_unseen.jsonl
     max_features: 100
     processors:
       text_processor:
@@ -32,7 +35,7 @@ hat      - propaganda/defaults/annotations/train.jsonl
           vocab:
             type: intersected
             embedding_name: glove.6B.300d
-            vocab_file: propaganda/defaults/extras/vocabs/vocabulary_100k.txt
+            vocab_file: hateful_memes/defaults/extras/vocabs/vocabulary_100k.txt
           preprocessor:
             type: simple_sentence
             params: {}

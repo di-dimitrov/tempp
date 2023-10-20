@@ -4,9 +4,9 @@ import os
 import warnings
 
 from mmf.common.registry import registry
-from mmf.datasets.builders.propaganda.dataset import (
-    PropagandaTask3FeaturesDataset,
-    PropagandaTask3Dataset,
+from mmf.datasets.builders.hateful_memes.dataset import (
+    HatefulMemesFeaturesDataset,
+    HatefulMemesImageDataset,
 )
 from mmf.datasets.mmf_dataset_builder import MMFDatasetBuilder
 from mmf.utils.configuration import get_mmf_env
@@ -14,35 +14,49 @@ from mmf.utils.file_io import PathManager
 from mmf.utils.general import get_absolute_path
 
 
-@registry.register_builder("propaganda")
-class PropagandaBuilder(MMFDatasetBuilder):
+@registry.register_builder("hateful_memes")
+class HatefulMemesBuilder(MMFDatasetBuilder):
     def __init__(
         self,
-        dataset_name="propaganda",
-        dataset_class=PropagandaTask3Dataset,
+        dataset_name="hateful_memes",
+        dataset_class=HatefulMemesImageDataset,
         *args,
         **kwargs,
     ):
         super().__init__(dataset_name, dataset_class, *args, **kwargs)
-        self.dataset_class = PropagandaTask3Dataset
+        self.dataset_class = HatefulMemesImageDataset
 
     @classmethod
     def config_path(self):
-        return "configs/datasets/propaganda/defaults.yaml"
+        return "configs/datasets/hateful_memes/defaults.yaml"
 
     def load(self, config, dataset_type, *args, **kwargs):
         config = config
 
         if config.use_features:
-            self.dataset_class = PropagandaTask3FeaturesDataset
+            self.dataset_class = HatefulMemesFeaturesDataset
 
         self.dataset = super().load(config, dataset_type, *args, **kwargs)
 
         return self.dataset
 
     def build(self, config, *args, **kwargs):
-        self.data_folder = os.path.join(
-            get_mmf_root(), config.data_dir
+        # First, check whether manual downloads have been performed
+        data_dir = get_mmf_env(key="data_dir")
+        test_path = get_absolute_path(
+            os.path.join(
+                data_dir,
+                "datasets",
+                self.dataset_name,
+                "defaults",
+                "annotations",
+                "train.jsonl",
+            )
+        )
+        # NOTE: This doesn't check for files, but that is a fine assumption for now
+        assert PathManager.exists(test_path), (
+            "Hateful Memes Dataset doesn't do automatic downloads; please "
+            + "follow instructions at https://fb.me/hm_prerequisites"
         )
         super().build(config, *args, **kwargs)
 

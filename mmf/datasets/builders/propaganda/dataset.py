@@ -28,6 +28,7 @@ class PropagandaTask3FeaturesDataset(MMFDataset):
             self._use_features
         ), "config's 'use_images' must be true to use image dataset"
         self.is_multilabel = self.config.get("is_multilabel", False)
+        
 
     def preprocess_sample_info(self, sample_info):
         image_path = sample_info["img"]
@@ -95,11 +96,12 @@ class PropagandaTask3Dataset(MMFDataset):
             self._use_images
         ), "config's 'use_images' must be true to use image dataset"
         self.is_multilabel = self.config.get("is_multilabel", False)
-
+        
     def init_processors(self):
         super().init_processors()
         # Assign transforms to the image_db
         self.image_db.transform = self.image_processor
+        self.labels = get_labels_vocab(self.annotation_db)
 
     def __getitem__(self, idx):
         sample_info = self.annotation_db[idx]

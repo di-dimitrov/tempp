@@ -7,22 +7,25 @@ dataset_config:
     use_features: false
     images:
       train:
-      - propaganda/defaults/images/
-      val:
-      - propaganda/defaults/images/
+      - data_splits/dev_images
       test:
-      - propaganda/defaults/images/
+      - data_splits/test_images
+      val:
+      - data_splits/validation_images
     features:
       train:
       - propaganda/defaults/features/detectron.lmdb
-      val:
+      test:
       - propaganda/defaults/features/detectron.lmdb
+      val: 
+      - propaganda/defaults/features/detectron.lmdb
+    annotations:
+      train:
+      - data_splits/data/mmf/train.jsonl
       test:
-hat      - propaganda/defaults/annotations/train.jsonl
+      - data_splits/data/mmf/test.jsonl
       val:
-      - propaganda/defaults/annotations/dev.jsonl
-      test:
-      - propaganda/defaults/annotations/test.jsonl
+      - data_splits/data/mmf/validation.jsonl
     max_features: 100
     processors:
       text_processor:

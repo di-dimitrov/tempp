@@ -30,7 +30,7 @@ evaluation:
   - multilabel_macro_f1
 
 training:
-  batch_size: 32
+  batch_size: 8
   lr_scheduler: true
   max_updates: 1500
   early_stop:

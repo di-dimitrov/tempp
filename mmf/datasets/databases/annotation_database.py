@@ -35,7 +35,7 @@ class AnnotationDatabase(torch.utils.data.Dataset):
             raise ValueError("Unknown file format for annotation db")
 
     def _load_jsonl(self, path):
-        with PathManager.open(path, "r") as f:
+        with PathManager.open(path, "r", encoding="utf-8") as f:
             db = f.readlines()
             for idx, line in enumerate(db):
                 db[idx] = json.loads(line.strip("\n"))
@@ -63,7 +63,7 @@ class AnnotationDatabase(torch.utils.data.Dataset):
             self.data = self.db
 
     def _load_json(self, path):
-        with PathManager.open(path, "r") as f:
+        with PathManager.open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
         self.metadata = data.get("metadata", {})
         self.data = data.get("data", [])
